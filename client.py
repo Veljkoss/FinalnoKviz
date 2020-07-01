@@ -1,5 +1,5 @@
 import pygame
-import pymongo
+from pymongo import MongoClient
 
 pygame.init()
 
