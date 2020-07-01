@@ -49,7 +49,7 @@ def gameWindow(backimage, colors):
 
 def dataRead(data):
     if(data == "history"):
-        print(data)
+        print("Vlajs")
 
 
 
@@ -65,13 +65,10 @@ def main():
     science_true = True
     trivia_true = True
     score = 0
+    data = ""
     scoreFont = pygame.font.SysFont("comicsansms", 40)
 
-
     while running:
-
-        data = ""
-        dataRead(data)
         scoreText = scoreFont.render(str(score), True, (0, 0, 0))
         win = pygame.display.set_mode((width, height))
         win.fill((119, 136, 153))
