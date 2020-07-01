@@ -1,6 +1,5 @@
 import pygame
+import pymongo
 
 pygame.init()
 
-
-print('Haha')
