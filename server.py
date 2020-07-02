@@ -32,6 +32,7 @@ def threaded_client(conn, player):
                 print("Received: ", data)
                 print("Sending : ", data)
 
+
             for c in all_connections:
                 c.sendall(str.encode(data))
         except:
