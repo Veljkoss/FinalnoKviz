@@ -1,7 +1,7 @@
 import pygame
-from pymongo import MongoClient
+#from pymongo import MongoClient
 from network import Network
-
+from _thread import *
 
 
 pygame.init()
@@ -39,7 +39,7 @@ def gameWindow(backimage, colors):
         win2 = pygame.display.set_mode((width, height))
         win2.blit(backimage, (0, 0))
         if active:
-            running2 = quest(win2, colors)
+            running2 = False
             pygame.display.update()
         active = True
         pygame.display.update()
@@ -47,9 +47,14 @@ def gameWindow(backimage, colors):
             running2 = False
         i += 1
 
-def dataRead(data):
-    if(data == "history"):
-        print("Vlajs")
+def dataRead(net):
+    while True:
+        data=net.recv()
+        if data == "history":
+            print(data)
+        if data=="geography":
+            print(data)
+
 
 
 
@@ -58,6 +63,8 @@ def dataRead(data):
 def main():
     running = True
     n = Network()
+    start_new_thread(dataRead,(n,))
+    #n.send("Povezan")
     history_true = True
     geography_true = True
     cinema_true = True
@@ -115,7 +122,9 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if pos_x < width / 5 + offset_x + 128 and pos_x > width / 5 + offset_x and pos_y > height / 4 + offset_y and pos_y < height / 4 + offset_y + 128 and history_true:
-                    data = n.send("history")
+                    n.send("history")
+
+
                     history_true = False
 
                 if pos_x < width / 5 * 2 + offset_x + 128 and pos_x > width / 5 * 2 + offset_x and pos_y > height / 4 + offset_y and pos_y < height / 4 + offset_y + 128 and geography_true:

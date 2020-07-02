@@ -1,11 +1,11 @@
 import socket
 from _thread import *
 
-server = "192.168.0.16"
+server = "127.0.0.1"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+all_connections=[]
 
 try:
     s.bind((server, port))
@@ -32,17 +32,21 @@ def threaded_client(conn, player):
                 print("Received: ", data)
                 print("Sending : ", data)
 
-            conn.sendall(str.encode(data))
+            for c in all_connections:
+                c.sendall(str.encode(data))
         except:
             break
 
     print("Lost connection")
+    all_connections.remove(conn)
     conn.close()
 
 currentPlayer = 0
 
 while True:
+
     conn, addr = s.accept()
+    all_connections.append(conn)
     print("Connected to:", addr)
 
     start_new_thread(threaded_client, (conn, currentPlayer))
