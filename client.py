@@ -1,7 +1,7 @@
 import pygame
-from pymongo import MongoClient
+#from pymongo import MongoClient
 from network import Network
-
+from _thread import *
 
 pygame.init()
 
@@ -30,33 +30,46 @@ hcolors = ((219,176,102), (204,153,51), (223,129,35))
 gcolors = ((135,206,250), (30,144,255), (65,105,225))
 
 
-def gameWindow(backimage, colors):
+def gameWindow(net, backimage, colors):
     running2 = True
     active = False
+    x = pygame.time.get_ticks()
     i = 0
     while running2:
         win2 = pygame.display.set_mode((width, height))
         win2.blit(backimage, (0, 0))
         if active:
-            running2 = quest(win2, colors)
             pygame.display.update()
         active = True
         pygame.display.update()
-        if i == 3:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running2 = False
+        if pygame.time.get_ticks() - x > 5000:
             running2 = False
-        i += 1
 
-def dataRead(data):
-    if(data == "history"):
-        print("Vlajs")
+
+
+
+
+data = ""
+
+def dataRead(net):
+    global data
+    while True:
+        data = net.recv()
+
+
 
 
 
 
 
 def main():
+    global data
     running = True
     n = Network()
+    start_new_thread(dataRead,(n,))
     history_true = True
     geography_true = True
     cinema_true = True
@@ -64,7 +77,6 @@ def main():
     science_true = True
     trivia_true = True
     score = 0
-    data = ""
     scoreFont = pygame.font.SysFont("comicsansms", 40)
 
     while running:
@@ -108,33 +120,38 @@ def main():
             win.blit(i7, (int(width / 5 * 3 + offset_x), int(height / 2 + offset_y)))
             win.blit(i8, (int(width / 5 * 3 + offset_x), int(height / 2 + offset_y)))
 
+        if data == "history":
+            gameWindow(n, i9, hcolors)
+
+        data = ""
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if pos_x < width / 5 + offset_x + 128 and pos_x > width / 5 + offset_x and pos_y > height / 4 + offset_y and pos_y < height / 4 + offset_y + 128 and history_true:
-                    data = n.send("history")
+                    n.send("history")
                     history_true = False
 
                 if pos_x < width / 5 * 2 + offset_x + 128 and pos_x > width / 5 * 2 + offset_x and pos_y > height / 4 + offset_y and pos_y < height / 4 + offset_y + 128 and geography_true:
-                    data = n.send("geography")
+                    n.send("geography")
                     geography_true = False
 
                 if pos_x < width / 5 * 3 + offset_x + 128 and pos_x > width / 5 * 3 + offset_x and pos_y > height / 4 + offset_y and pos_y < height / 4 + offset_y + 128 and cinema_true:
-                    data = n.send("cinema")
+                    n.send("cinema")
                     cinema_true = False
 
                 if pos_x < width / 5 + offset_x + 128 and pos_x > width / 5 + offset_x and pos_y > height / 2 + offset_y and pos_y < height / 2 + offset_y + 128 and sport_true:
-                    data = n.send("sport")
+                    n.send("sport")
                     sport_true = False
 
                 if pos_x < width / 5 * 2 + offset_x + 128 and pos_x > width / 5 * 2 + offset_x and pos_y > height / 2 + offset_y and pos_y < height / 2 + offset_y + 128 and science_true:
-                    data = n.send("science")
+                    n.send("science")
                     science_true = False
 
                 if pos_x < width / 5 * 3 + offset_x + 128 and pos_x > width / 5 * 3 + offset_x and pos_y > height / 2 + offset_y and pos_y < height / 2 + offset_y + 128 and trivia_true:
-                    data = n.send("trivia")
+                    n.send("trivia")
                     trivia_true = False
 
         pygame.display.update()
