@@ -40,7 +40,7 @@ def gameWindow(net, backimage, colors):
         active = True
         pygame.display.update()
         for event in pygame.event.get():
-            if event.type == pygame.QUIT
+            if event.type == pygame.QUIT:
                 running2 = False
         if pygame.time.get_ticks() - x > 5000:
             running2 = False
