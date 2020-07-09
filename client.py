@@ -22,9 +22,14 @@ i9 = pygame.image.load("img/h1.jpg")
 i10 = pygame.image.load("img/circle.png")
 i11 = pygame.image.load("img/right.png")
 i12 = pygame.image.load("img/globeback.jpg")
+i13 = pygame.image.load("img/sound.png")
+i14 = pygame.image.load("img/mute.png")
 
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
+
+m1 = pygame.mixer.music.load("msc/seka.mp3")
+
 
 def quest(win2, pitanje, colors):
     crt = 0
@@ -34,10 +39,10 @@ def quest(win2, pitanje, colors):
     crtProcitano1 = float(crtProcitano)
     questFont = pygame.font.SysFont("comicsansms", 40)
     ansFont = pygame.font.SysFont("comicsansms", 25)
-    q1 = questFont.render(q, True, (0,0,0))
-    ans11 = ansFont.render(ans1, True, (0,0,0))
-    ans22 = ansFont.render(ans2, True, (0,0,0))
-    ans33 = ansFont.render(ans3, True, (0,0,0))
+    q1 = questFont.render(q, True, (0, 0, 0))
+    ans11 = ansFont.render(ans1, True, (0, 0, 0))
+    ans22 = ansFont.render(ans2, True, (0, 0, 0))
+    ans33 = ansFont.render(ans3, True, (0, 0, 0))
 
     win2.blit(q1, (100, 50))
     pygame.draw.rect(win2, colors[0], (0, 170, width, 100))
@@ -63,7 +68,7 @@ def quest(win2, pitanje, colors):
                     win2.blit(i11, (50, 358))
                     crt = 2
                 if 470 < pos_y < 570:
-                    win2.blit(i11, (50,508))
+                    win2.blit(i11, (50, 508))
                     crt = 3
         pygame.display.update()
 
@@ -94,7 +99,6 @@ def gameWindow(net, backimage, colors, pitanja):
             running2 = False
 
 
-
 data = ""
 
 
@@ -115,8 +119,11 @@ def main():
     sport_true = True
     science_true = True
     trivia_true = True
+    sound_true = True
     score = 0
     scoreFont = pygame.font.SysFont("comicsansms", 40)
+
+    pygame.mixer.music.play(-1)
 
     while running:
         scoreText = scoreFont.render(str(score), True, (0, 0, 0))
@@ -154,6 +161,14 @@ def main():
         if not trivia_true:
             win.blit(i8, (int(width / 5 * 3 + offset_x), int(height / 2 + offset_y)))
 
+        if sound_true:
+            win.blit(i13, (20, height - 80))
+
+        if not sound_true:
+            win.blit(i14, (20, height - 80))
+            pygame.mixer.music.pause()
+
+
         if str(data).startswith("pokreni_history"):
             niz = data.split("::")
             pitanja = niz[1]
@@ -190,6 +205,15 @@ def main():
                 if width / 5 * 3 + offset_x + 128 > pos_x > width / 5 * 3 + offset_x and height / 2 + offset_y < pos_y < height / 2 + offset_y + 128 and trivia_true:
                     n.send("trivia")
                     trivia_true = False
+
+                if 20 < pos_x < 52 and height - 80 < pos_y < height - 80 +32:
+                    if sound_true:
+                        sound_true = False
+                        pygame.mixer.music.pause()
+
+                    elif not sound_true:
+                        sound_true = True
+                        pygame.mixer.music.unpause()
 
         pygame.display.update()
 
