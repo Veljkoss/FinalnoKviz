@@ -31,6 +31,7 @@ def quest(win2, pitanje, colors):
     x = pygame.time.get_ticks()
     runn = True
     q, ans1, ans2, ans3, crtProcitano = pitanje.split(",")
+    crtProcitano1 = float(crtProcitano)
     questFont = pygame.font.SysFont("comicsansms", 40)
     ansFont = pygame.font.SysFont("comicsansms", 25)
     q1 = questFont.render(q, True, (0,0,0))
@@ -66,9 +67,8 @@ def quest(win2, pitanje, colors):
                     crt = 3
         pygame.display.update()
 
-    if crt == crtProcitano:
+    if crt == crtProcitano1:
         print("TACNO")
-        score += 2
 
     return runn
 
