@@ -1,5 +1,5 @@
 import pygame
-# from pymongo import MongoClient
+from pymongo import MongoClient
 from network import Network
 from _thread import *
 
@@ -28,10 +28,14 @@ gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
 
 
 def gameWindow(net, backimage, colors):
+    global data
     running2 = True
     active = False
     x = pygame.time.get_ticks()
     i = 0
+    net.send("historyActive")
+    quest = data
+    print(quest)
     while running2:
         win2 = pygame.display.set_mode((width, height))
         win2.blit(backimage, (0, 0))
@@ -107,6 +111,7 @@ def main():
 
         if data == "history":
             gameWindow(n, i9, hcolors)
+            history_true = False
 
         data = ""
 
@@ -117,7 +122,7 @@ def main():
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if width / 5 + offset_x + 128 > pos_x > width / 5 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and history_true:
                     n.send("history")
-                    history_true = False
+                    #history_true = False
 
                 if width / 5 * 2 + offset_x + 128 > pos_x > width / 5 * 2 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and geography_true:
                     n.send("geography")
