@@ -26,29 +26,73 @@ i12 = pygame.image.load("img/globeback.jpg")
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
 
+def quest(win2, pitanje, colors):
+    crt = 0
+    x = pygame.time.get_ticks()
+    runn = True
+    q, ans1, ans2, ans3, crtProcitano = pitanje.split(",")
+    questFont = pygame.font.SysFont("comicsansms", 40)
+    ansFont = pygame.font.SysFont("comicsansms", 25)
+    q1 = questFont.render(q, True, (0,0,0))
+    ans11 = ansFont.render(ans1, True, (0,0,0))
+    ans22 = ansFont.render(ans2, True, (0,0,0))
+    ans33 = ansFont.render(ans3, True, (0,0,0))
+
+    win2.blit(q1, (100, 50))
+    pygame.draw.rect(win2, colors[0], (0, 170, width, 100))
+    win2.blit(ans11, (100, 200))
+    win2.blit(i10, (50, 208))
+    pygame.draw.rect(win2, colors[1], (0, 320, width, 100))
+    win2.blit(ans22, (100, 350))
+    win2.blit(i10, (50, 358))
+    pygame.draw.rect(win2, colors[2], (0, 470, width, 100))
+    win2.blit(ans33, (100, 500))
+    win2.blit(i10, (50, 508))
+
+    while pygame.time.get_ticks() - x < 3000:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                runn = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos_x, pos_y = pygame.mouse.get_pos()
+                if 170 < pos_y < 270:
+                    win2.blit(i11, (50, 208))
+                    crt = 1
+                if 320 < pos_y < 420:
+                    win2.blit(i11, (50, 358))
+                    crt = 2
+                if 470 < pos_y < 570:
+                    win2.blit(i11, (50,508))
+                    crt = 3
+        pygame.display.update()
+
+    if crt == crtProcitano:
+        print("TACNO")
+        score += 2
+
+    return runn
+
 
 def gameWindow(net, backimage, colors, pitanja):
     print("Usao sam u gamewindow sa pitanjima : " + pitanja)
-    #global data
     running2 = True
     active = False
     x = pygame.time.get_ticks()
     i = 0
-    #net.send("historyActive")
-    quest = pitanja
-    print(quest)
+    nizPitanja = pitanja.split("/")
+    print(nizPitanja[0])
     while running2:
         win2 = pygame.display.set_mode((width, height))
         win2.blit(backimage, (0, 0))
         if active:
+            running2 = quest(win2, nizPitanja[i], hcolors)
+            i += 1
             pygame.display.update()
         active = True
         pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running2 = False
-        if pygame.time.get_ticks() - x > 5000:
+        if i == 3:
             running2 = False
+
 
 
 data = ""

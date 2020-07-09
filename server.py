@@ -5,7 +5,7 @@ from random import randint
 from pymongo import MongoClient
 
 client = MongoClient('mongodb://localhost:27017/')
-db = client["quiz_database"]
+db = client["quiz_datebase"]
 history_questions = db["history_questions"]
 
 server = "127.0.0.1"
