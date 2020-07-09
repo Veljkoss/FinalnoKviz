@@ -27,14 +27,15 @@ hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
 
 
-def gameWindow(net, backimage, colors):
-    global data
+def gameWindow(net, backimage, colors, pitanja):
+    print("Usao sam u gamewindow sa pitanjima : " + pitanja)
+    #global data
     running2 = True
     active = False
     x = pygame.time.get_ticks()
     i = 0
-    net.send("historyActive")
-    quest = data
+    #net.send("historyActive")
+    quest = pitanja
     print(quest)
     while running2:
         win2 = pygame.display.set_mode((width, height))
@@ -109,8 +110,10 @@ def main():
         if not trivia_true:
             win.blit(i8, (int(width / 5 * 3 + offset_x), int(height / 2 + offset_y)))
 
-        if data == "history":
-            gameWindow(n, i9, hcolors)
+        if str(data).startswith("pokreni_history"):
+            niz = data.split("::")
+            pitanja = niz[1]
+            gameWindow(n, i9, hcolors, pitanja)
             history_true = False
 
         data = ""
@@ -122,7 +125,7 @@ def main():
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if width / 5 + offset_x + 128 > pos_x > width / 5 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and history_true:
                     n.send("history")
-                    #history_true = False
+                    # history_true = False
 
                 if width / 5 * 2 + offset_x + 128 > pos_x > width / 5 * 2 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and geography_true:
                     n.send("geography")
