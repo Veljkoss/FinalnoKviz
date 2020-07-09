@@ -29,6 +29,7 @@ hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
 
 m1 = pygame.mixer.music.load("msc/seka.mp3")
+m2 = pygame.mixer.music.load("msc/m1.mp3")
 
 
 def quest(win2, pitanje, colors):
