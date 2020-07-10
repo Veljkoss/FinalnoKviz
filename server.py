@@ -1,7 +1,6 @@
 import socket
 from _thread import *
 from random import randint
-
 from pymongo import MongoClient
 
 client = MongoClient('mongodb://localhost:27017/')
@@ -10,8 +9,6 @@ history_questions = db["history_questions"]
 
 server = "127.0.0.1"
 port = 5555
-
-print(history_questions.find_one())
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 all_connections = []
@@ -51,15 +48,23 @@ def readFromMongo():
     return por
 
 
-def threaded_client(conn, player):
+def game(conn1, conn2):
+    start_new_thread(threaded_client, (conn1, conn2))
+    start_new_thread(threaded_client, (conn2, conn1))
+
+
+def threaded_client(conn1, conn2):
+    game_connections = []
+    game_connections.append(conn1)
+    game_connections.append(conn2)
     while True:
         try:
-            data = conn.recv(2048).decode()
+            data = conn1.recv(2048).decode()
             print("primio: " + data)
             if data == "history":
                 reply = readFromMongo()
                 print("procitao pitanja")
-                for c in all_connections:
+                for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
                 print(reply)
 
@@ -72,22 +77,19 @@ def threaded_client(conn, player):
                 print("Received: ", data)
                 print("Sending : ", data)
 
-            for c in all_connections:
+            for c in game_connections:
                 c.sendall(str.encode(data))
         except:
             break
 
     print("Lost connection")
-    all_connections.remove(conn)
     conn.close()
 
-
-currentPlayer = 0
 
 while True:
     conn, addr = s.accept()
     all_connections.append(conn)
     print("Connected to:", addr)
-
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    if len(all_connections) == 2:
+        start_new_thread(game, (all_connections[0], all_connections[1]))
+        all_connections.clear()

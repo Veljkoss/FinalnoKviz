@@ -108,6 +108,62 @@ def dataRead(net):
     while True:
         data = net.recv()
 
+def startWindow():
+
+    screen = pygame.display.set_mode((500, 300))
+    font = pygame.font.Font(None, 32)
+    clock = pygame.time.Clock()
+    input_box = pygame.Rect(int(500/2 - 100), int(300/2 - 16), 140, 32)
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        print(text)
+                        text = ''
+                        done = True
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        screen.fill((119, 136, 153))
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        # Blit the text.
+        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        # Blit the input_box rect.
+        pygame.draw.rect(screen, color, input_box, 2)
+        pygame.display.update()
+        clock.tick(30)
+
+    main()
+
+
+
+
+
 
 def main():
     global data
@@ -124,7 +180,7 @@ def main():
     score = 0
     scoreFont = pygame.font.SysFont("comicsansms", 40)
 
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
 
     while running:
         scoreText = scoreFont.render(str(score), True, (0, 0, 0))
@@ -219,4 +275,5 @@ def main():
         pygame.display.update()
 
 
-main()
+#main()
+startWindow()
