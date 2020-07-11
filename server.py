@@ -4,7 +4,7 @@ from random import randint
 from pymongo import MongoClient
 
 client = MongoClient('mongodb://localhost:27017/')
-db = client["quiz_datebase"]
+db = client["quiz_database"]
 history_questions = db["history_questions"]
 
 server = "127.0.0.1"
@@ -60,14 +60,17 @@ def threaded_client(conn1, conn2):
     while True:
         try:
             data = conn1.recv(2048).decode()
-            print("primio: " + data)
+            print("primiooooo: " + data)
             if data == "history":
                 reply = readFromMongo()
                 print("procitao pitanja")
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
                 print(reply)
+                continue
 
+            if str(data).startswith("Score:"):
+                conn2.send(str.encode(data))
                 continue
 
             if not data:
@@ -79,6 +82,7 @@ def threaded_client(conn1, conn2):
 
             for c in game_connections:
                 c.sendall(str.encode(data))
+
         except:
             break
 

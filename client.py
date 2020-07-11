@@ -28,11 +28,17 @@ i14 = pygame.image.load("img/mute.png")
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
 
+
+score1 = 0
+score2 = 0
+
 m1 = pygame.mixer.music.load("msc/seka.mp3")
 m2 = pygame.mixer.music.load("msc/m1.mp3")
 
 
 def quest(win2, pitanje, colors):
+    global score1
+    global score2
     crt = 0
     x = pygame.time.get_ticks()
     runn = True
@@ -44,6 +50,7 @@ def quest(win2, pitanje, colors):
     ans11 = ansFont.render(ans1, True, (0, 0, 0))
     ans22 = ansFont.render(ans2, True, (0, 0, 0))
     ans33 = ansFont.render(ans3, True, (0, 0, 0))
+    scr = 0
 
     win2.blit(q1, (100, 50))
     pygame.draw.rect(win2, colors[0], (0, 170, width, 100))
@@ -74,7 +81,7 @@ def quest(win2, pitanje, colors):
         pygame.display.update()
 
     if crt == crtProcitano1:
-        print("TACNO")
+        score1 += 1
 
     return runn
 
@@ -99,6 +106,7 @@ def gameWindow(net, backimage, colors, pitanja):
         if i == 3:
             running2 = False
 
+    net.send("Score:" + str(score1))
 
 data = ""
 
@@ -177,16 +185,19 @@ def main():
     science_true = True
     trivia_true = True
     sound_true = True
-    score = 0
+    global score1
     scoreFont = pygame.font.SysFont("comicsansms", 40)
+    global score2
 
     #pygame.mixer.music.play(-1)
 
     while running:
-        scoreText = scoreFont.render(str(score), True, (0, 0, 0))
+        score1Text = scoreFont.render(str(score1), True, (0, 0, 0))
+        score2Text = scoreFont.render(str(score2), True, (0, 0, 0))
         win = pygame.display.set_mode((width, height))
         win.fill((119, 136, 153))
-        win.blit(scoreText, (10, 10))
+        win.blit(score1Text, (20, 10))
+        win.blit(score2Text, (950, 10))
 
         win.blit(i2, (int(width / 5 + offset_x), int(height / 4 + offset_y)))
 
@@ -231,6 +242,12 @@ def main():
             pitanja = niz[1]
             gameWindow(n, i9, hcolors, pitanja)
             history_true = False
+
+
+        if str(data).startswith("Score:"):
+            score = str(data).split(":")[1]
+            print("primio: " + str(score))
+            score2 = score2 + int(score)
 
         data = ""
 
