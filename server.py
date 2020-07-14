@@ -6,6 +6,8 @@ from pymongo import MongoClient
 client = MongoClient('mongodb://localhost:27017/')
 db = client["quiz_database"]
 history_questions = db["history_questions"]
+geography_questions = db["geography_questions"]
+
 
 server = "127.0.0.1"
 port = 5555
@@ -23,12 +25,12 @@ s.listen(2)
 print("Waiting for connection, Server started")
 
 
-def readFromMongo():
+def readFromMongo(oblast):
     por = ""
     i = 0
     while i < 3:
         rnd = randint(1, 3)
-        result = history_questions.find_one({"_id": rnd})
+        result = oblast.find_one({"_id": rnd})
         print("test")
         quest = result["quest"]
         print(quest)
@@ -60,13 +62,24 @@ def threaded_client(conn1, conn2):
     while True:
         try:
             data = conn1.recv(2048).decode()
-            print("primiooooo: " + data)
             if data == "history":
-                reply = readFromMongo()
+                reply = readFromMongo(history_questions)
                 print("procitao pitanja")
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
                 print(reply)
+                continue
+
+            if data == "geography":
+                reply = readFromMongo(geography_questions)
+                print("procitao pitanja")
+                for c in game_connections:
+                    c.sendall(str.encode("pokreni_geography::" + reply))
+                print(reply)
+                continue
+
+            if data == "fin":
+                conn2.send(str.encode("turn"))
                 continue
 
             if str(data).startswith("Score:"):
@@ -95,5 +108,7 @@ while True:
     all_connections.append(conn)
     print("Connected to:", addr)
     if len(all_connections) == 2:
+        for conn in all_connections:
+            conn.send(str.encode("ready"))
         start_new_thread(game, (all_connections[0], all_connections[1]))
         all_connections.clear()
