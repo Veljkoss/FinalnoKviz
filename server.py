@@ -7,6 +7,8 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client["quiz_database"]
 history_questions = db["history_questions"]
 geography_questions = db["geography_questions"]
+players = db["players"]
+score = 0
 
 
 server = "127.0.0.1"
@@ -28,8 +30,15 @@ print("Waiting for connection, Server started")
 def readFromMongo(oblast):
     por = ""
     i = 0
+    izabrani = []
     while i < 3:
         rnd = randint(1, 3)
+        while rnd in izabrani:
+            rnd = randint(1,3)
+
+
+        izabrani.append(rnd)
+
         result = oblast.find_one({"_id": rnd})
         print("test")
         quest = result["quest"]
@@ -56,6 +65,8 @@ def game(conn1, conn2):
 
 
 def threaded_client(conn1, conn2):
+    global playerName
+    global score
     game_connections = []
     game_connections.append(conn1)
     game_connections.append(conn2)
@@ -83,6 +94,10 @@ def threaded_client(conn1, conn2):
                 continue
 
             if str(data).startswith("Score:"):
+                conn2.send(str.encode(data))
+                continue
+
+            if str(data).startswith("name:"):
                 conn2.send(str.encode(data))
                 continue
 

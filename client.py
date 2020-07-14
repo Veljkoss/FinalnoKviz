@@ -122,7 +122,7 @@ def dataRead(net):
         data = net.recv()
 
 def startWindow():
-
+    global p1Name
     screen = pygame.display.set_mode((500, 300))
     font = pygame.font.Font(None, 32)
     clock = pygame.time.Clock()
@@ -182,6 +182,7 @@ def startWindow():
 
 def main():
     global p1Name
+    global p2Name
     global data
     running = True
     n = Network()
@@ -201,6 +202,7 @@ def main():
     #pygame.mixer.music.play(-1)
     j = 0
 
+
     while True:
         win = pygame.display.set_mode((width, height))
         win.fill((119, 136, 153))
@@ -219,14 +221,23 @@ def main():
             break
 
 
+
+    pygame.time.wait(500)
+    n.send("name:" + p1Name)
+    pygame.time.wait(500)
+    if str(data).startswith("name:"):
+        print("Primio:" + str(data).split(':')[1])
+        p2Name = str(data).split(':')[1]
+
+
     data = ""
     while running:
-        score1Text = scoreFont.render(str(score1), True, (0, 0, 0))
-        score2Text = scoreFont.render(str(score2), True, (0, 0, 0))
+        score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
+        score2Text = scoreFont.render(p2Name + ":" + str(score2), True, (0, 0, 0))
         win = pygame.display.set_mode((width, height))
         win.fill((119, 136, 153))
         win.blit(score1Text, (20, 10))
-        win.blit(score2Text, (950, 10))
+        win.blit(score2Text, (950 - len(p2Name) * 20, 10))
 
         if data == "turn":
             turn = True
