@@ -40,20 +40,12 @@ def readFromMongo(oblast):
         izabrani.append(rnd)
 
         result = oblast.find_one({"_id": rnd})
-        print("test")
         quest = result["quest"]
-        print(quest)
         ans1 = result["ans1"]
-        print(ans1)
         ans2 = result["ans2"]
-        print(ans2)
         ans3 = result["ans3"]
-        print(type(ans3))
         crt = str(result["crt"])
-        print(type(crt))
         por = por + quest + ',' + ans1 + ',' + ans2 + ',' + ans3 + ',' + crt + '/'
-        # str = str.join((quest, ",", ans1, ",", ans2, ",", ans3, "/"))
-        print("ziv sam")
         i = i + 1
 
     return por
