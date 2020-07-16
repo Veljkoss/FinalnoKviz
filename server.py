@@ -8,7 +8,6 @@ db = client["quiz_database"]
 history_questions = db["history_questions"]
 geography_questions = db["geography_questions"]
 players = db["players"]
-score = 0
 
 
 server = "127.0.0.1"
@@ -57,8 +56,9 @@ def game(conn1, conn2):
 
 
 def threaded_client(conn1, conn2):
-    global playerName
-    global score
+    playerName = ""
+    score = 0
+
     game_connections = []
     game_connections.append(conn1)
     game_connections.append(conn2)
@@ -86,10 +86,12 @@ def threaded_client(conn1, conn2):
                 continue
 
             if str(data).startswith("Score:"):
+                score = int(str(data).split(":")[1])
                 conn2.send(str.encode(data))
                 continue
 
             if str(data).startswith("name:"):
+                playerName = str(data).split(':')[1]
                 conn2.send(str.encode(data))
                 continue
 
@@ -106,8 +108,35 @@ def threaded_client(conn1, conn2):
         except:
             break
 
+    print(playerName)
+    print(score)
+
+    pl = players.find()
+    postoji = False
+    for player in pl:
+        if playerName == player["name"]:
+            players.update_one({ "_id": player["_id"]}, { "$set": {"score": int(player["score"]) + score}})
+            postoji = True
+
+    if not postoji:
+        players.insert_one({ "name": playerName, "score": score})
+
+    lvl = score / 30
+
     print("Lost connection")
     conn.close()
+
+def logHandler(conn):
+    while True:
+        try:
+            data = conn.recv(2048).decode()
+            if data == "log":
+                pass
+            if data == "reg":
+                pass
+        except:
+            break
+
 
 
 while True:

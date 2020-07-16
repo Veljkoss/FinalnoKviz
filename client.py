@@ -126,7 +126,8 @@ def startWindow():
     screen = pygame.display.set_mode((500, 300))
     font = pygame.font.Font(None, 32)
     clock = pygame.time.Clock()
-    input_box = pygame.Rect(int(500/2 - 100), int(300/2 - 16), 140, 32)
+    input_box = pygame.Rect(int(500/2 - 100), int(300/2 - 80), 140, 32)
+    #input_box1 = pygame.Rect(int(500/2 - 100), int(300/2 - 40), 140, 32)
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
@@ -166,10 +167,12 @@ def startWindow():
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
+        #input_box1.w = width
         # Blit the text.
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
+        #pygame.draw.rect(screen, color, input_box1, 2)
         pygame.display.update()
         clock.tick(30)
 
@@ -294,6 +297,7 @@ def main():
 
         if str(data).startswith("Score:"):
             score = str(data).split(":")[1]
+            pygame.time.wait(500)
             print("primio: " + str(score))
             score2 = int(score)
             if i == 1:
