@@ -2,6 +2,7 @@ import socket
 from _thread import *
 from random import randint
 from pymongo import MongoClient
+import time
 
 client = MongoClient('mongodb://localhost:27017/')
 db = client["quiz_database"]
@@ -112,39 +113,72 @@ def threaded_client(conn1, conn2):
     print(score)
 
     pl = players.find()
-    postoji = False
     for player in pl:
         if playerName == player["name"]:
             players.update_one({ "_id": player["_id"]}, { "$set": {"score": int(player["score"]) + score}})
-            postoji = True
 
-    if not postoji:
-        players.insert_one({ "name": playerName, "score": score})
 
-    lvl = score / 30
 
     print("Lost connection")
     conn.close()
 
+
 def logHandler(conn):
-    while True:
+    global all_connections
+    uspesno = False
+    logActive = True
+
+    while logActive:
         try:
+            registr = False
             data = conn.recv(2048).decode()
-            if data == "log":
-                pass
-            if data == "reg":
-                pass
+            pl = players.find()
+            if str(data).startswith("log"):
+                user = str(data).split("/")[1].split(":")[0]
+                password = str(data).split("/")[1].split(":")[1]
+                print(str(data))
+                for player in pl:
+                    print("usao")
+                    if user == player["name"] and password == player["password"]:
+                        uspesno = True
+                        conn.send(str.encode("logu"))
+                        logActive = False
+                        break
+                if not uspesno:
+                    conn.send(str.encode("logn"))
+
+            if str(data).startswith("reg"):
+                user = str(data).split("/")[1].split(":")[0]
+                password = str(data).split("/")[1].split(":")[1]
+                print(str(data))
+                for player in pl:
+                    if user == player["name"]:
+                        conn.send(str.encode("regn"))
+                        registr = True
+                        break
+
+                if not registr:
+                    players.insert_one({"name": user, "password": password, "score": 0})
+                    conn.send(str.encode("regu"))
+
         except:
             break
 
+    if uspesno:
+        all_connections.append(conn)
+        print("uspesno")
 
-
-while True:
-    conn, addr = s.accept()
-    all_connections.append(conn)
-    print("Connected to:", addr)
     if len(all_connections) == 2:
+        time.sleep(.500)
         for conn in all_connections:
             conn.send(str.encode("ready"))
         start_new_thread(game, (all_connections[0], all_connections[1]))
         all_connections.clear()
+    return
+
+
+while True:
+    conn, addr = s.accept()
+    start_new_thread(logHandler, (conn,))
+    #all_connections.append(conn)
+    print("Connected to:", addr)

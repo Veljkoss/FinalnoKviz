@@ -16,7 +16,7 @@ i3 = pygame.image.load("img/globe.png")
 i4 = pygame.image.load("img/cinema.png")
 i5 = pygame.image.load("img/basketball.png")
 i6 = pygame.image.load("img/science.png")
-i7 = pygame.image.load("img/quiz.png")
+i7 = pygame.image.load("img/quizq.png")
 i8 = pygame.image.load("img/cross.png")
 i9 = pygame.image.load("img/h1.jpg")
 i10 = pygame.image.load("img/circle.png")
@@ -26,6 +26,9 @@ i13 = pygame.image.load("img/sound.png")
 i14 = pygame.image.load("img/mute.png")
 i15 = pygame.image.load("img/loading.png")
 i16 = pygame.image.load("img/loading1.png")
+i17 = pygame.image.load("img/enter.png")
+i18 = pygame.image.load("img/patient.png")
+i19 = pygame.image.load("img/dblue.jpg")
 
 
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
@@ -36,6 +39,7 @@ score1 = 0
 score2 = 0
 p1Name = ""
 p2Name = ""
+password = ""
 
 m1 = pygame.mixer.music.load("msc/seka.mp3")
 #m2 = pygame.mixer.music.load("msc/m1.mp3")
@@ -120,22 +124,51 @@ def dataRead(net):
     global data
     while True:
         data = net.recv()
+        if data == "logu":
+            print(str(data))
+        if data == "logn":
+            print(str(data))
 
 def startWindow():
+    n = Network()
+    start_new_thread(dataRead, (n,))
+    global data
     global p1Name
+    global password
     screen = pygame.display.set_mode((500, 300))
     font = pygame.font.Font(None, 32)
     clock = pygame.time.Clock()
     input_box = pygame.Rect(int(500/2 - 100), int(300/2 - 80), 140, 32)
-    #input_box1 = pygame.Rect(int(500/2 - 100), int(300/2 - 40), 140, 32)
+    input_box1 = pygame.Rect(int(500/2 - 100), int(300/2 - 40), 140, 32)
     color_inactive = pygame.Color('lightskyblue3')
     color_active = pygame.Color('dodgerblue2')
     color = color_inactive
     active = False
     text = ''
+    text1 = ''
     done = False
+    active1 = False
+    color1 = color_inactive
+    neuspesanLogin = False
+    uspesnaRegistracija = False
+    neuspesnaRegistracija = False
+    state = 0
+
 
     while not done:
+        if data == "logu":
+            break
+        if data == "logn":
+            state = 1
+
+        if data == "regu":
+            state = 2
+
+        if data == "regn":
+            state = 3
+
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -146,50 +179,93 @@ def startWindow():
                     active = not active
                 else:
                     active = False
+
+                if input_box1.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active1 = not active
+                else:
+                    active1 = False
                 # Change the current color of the input box.
                 color = color_active if active else color_inactive
+                color1 = color_active if active1 else color_inactive
             if event.type == pygame.KEYDOWN:
                 if active:
-                    if event.key == pygame.K_RETURN:
-                        print(text)
-                        p1Name = text
-
-                        text = ''
-                        done = True
-                    elif event.key == pygame.K_BACKSPACE:
+                    if event.key == pygame.K_BACKSPACE:
                         text = text[:-1]
                     else:
                         text += event.unicode
 
-        screen.fill((119, 136, 153))
+                if active1:
+                    if event.key == pygame.K_BACKSPACE:
+                        text1 = text1[:-1]
+                    else:
+                        text1 += event.unicode
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos_x, pos_y = pygame.mouse.get_pos()
+                if 198 < pos_x < 230 and 175 < pos_y < 207:
+                    p1Name = text
+                    print(p1Name)
+                    password = text1
+                    print(password)
+                    n.send("log/" + p1Name + ":" + password)
+
+                if 270 < pos_x < 302 and 175 < pos_y < 207:
+                    p1Name = text
+                    password = text1
+                    n.send("reg/" + p1Name + ":" + password)
+
+        screen.blit(i19, (0, 0))
+        #screen.fill((119, 136, 153))
         # Render the current text.
         txt_surface = font.render(text, True, color)
+        txt_surface1 = font.render("*" * len(text1), True, color)
+        txt_surface2 = font.render("Neispravan username/lozinka!", True, (178, 34, 34))
+        txt_surface3 = font.render("Uspesno ste se registrovali!", True, (50,205,50))
+        txt_surface4 = font.render("Korisnicko ime je zauzeto!", True, (178, 34, 34))
+
+
+
+        if state == 1:
+            screen.blit(txt_surface2, (85 ,250))
+
+        if state == 2:
+            screen.blit(txt_surface3, (85 ,250))
+
+        if state == 3:
+            screen.blit(txt_surface4, (85, 250))
+
+
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
-        #input_box1.w = width
+        input_box1.w = width
         # Blit the text.
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        screen.blit(txt_surface1, (input_box1.x+5, input_box1.y+5))
+        screen.blit(i17, (218 - 20, 175))
+        screen.blit(i18, (250 + 20, 175))
+
         # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
-        #pygame.draw.rect(screen, color, input_box1, 2)
+        pygame.draw.rect(screen, color1, input_box1, 2)
         pygame.display.update()
         clock.tick(30)
 
-    main()
+    main(n)
 
 
 
 
 
 
-def main():
+def main(n):
     global p1Name
     global p2Name
     global data
     running = True
-    n = Network()
-    start_new_thread(dataRead, (n,))
+    #n = Network()
+    #start_new_thread(dataRead, (n,))
     history_true = True
     geography_true = True
     cinema_true = True
@@ -208,7 +284,8 @@ def main():
 
     while True:
         win = pygame.display.set_mode((width, height))
-        win.fill((119, 136, 153))
+        win.blit(i19, (0,0))
+        #win.fill((119, 136, 153))
         txt = scoreFont.render("Povezivanje sa drugim igracem...", True, (0,0,0))
         win.blit(txt, (100, 200))
 
@@ -238,7 +315,8 @@ def main():
         score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
         score2Text = scoreFont.render(p2Name + ":" + str(score2), True, (0, 0, 0))
         win = pygame.display.set_mode((width, height))
-        win.fill((119, 136, 153))
+        win.blit(i19, (0,0))
+        #win.fill((119, 136, 153))
         win.blit(score1Text, (20, 10))
         win.blit(score2Text, (950 - len(p2Name) * 20, 10))
 
