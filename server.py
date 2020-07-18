@@ -68,7 +68,6 @@ def threaded_client(conn1, conn2):
             data = conn1.recv(2048).decode()
             if data == "history":
                 reply = readFromMongo(history_questions)
-                print("procitao pitanja")
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
                 print(reply)
@@ -76,19 +75,49 @@ def threaded_client(conn1, conn2):
 
             if data == "geography":
                 reply = readFromMongo(geography_questions)
-                print("procitao pitanja")
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_geography::" + reply))
                 print(reply)
                 continue
 
+            if data == "cinema":
+                reply = readFromMongo(geography_questions)
+                for c in game_connections:
+                    c.sendall(str.encode("pokreni_cinema::" + reply))
+                print(reply)
+                continue
+
+            if data == "sport":
+                reply = readFromMongo(geography_questions)
+                for c in game_connections:
+                    c.sendall(str.encode("pokreni_sport::" + reply))
+                print(reply)
+                continue
+
+            if data == "science":
+                reply = readFromMongo(geography_questions)
+                for c in game_connections:
+                    c.sendall(str.encode("pokreni_science::" + reply))
+                print(reply)
+                continue
+
+            if data == "trivia":
+                reply = readFromMongo(geography_questions)
+                for c in game_connections:
+                    c.sendall(str.encode("pokreni_trivia::" + reply))
+                print(reply)
+                continue
+
             if data == "fin":
+                print("PRIMIO FINNNNNNNN")
                 conn2.send(str.encode("turn"))
+                time.sleep(0.500)
                 continue
 
             if str(data).startswith("Score:"):
                 score = int(str(data).split(":")[1])
                 conn2.send(str.encode(data))
+                time.sleep(.500)
                 continue
 
             if str(data).startswith("name:"):
@@ -136,9 +165,7 @@ def logHandler(conn):
             if str(data).startswith("log"):
                 user = str(data).split("/")[1].split(":")[0]
                 password = str(data).split("/")[1].split(":")[1]
-                print(str(data))
                 for player in pl:
-                    print("usao")
                     if user == player["name"] and password == player["password"]:
                         uspesno = True
                         conn.send(str.encode("logu"))
@@ -150,7 +177,6 @@ def logHandler(conn):
             if str(data).startswith("reg"):
                 user = str(data).split("/")[1].split(":")[0]
                 password = str(data).split("/")[1].split(":")[1]
-                print(str(data))
                 for player in pl:
                     if user == player["name"]:
                         conn.send(str.encode("regn"))
@@ -166,14 +192,23 @@ def logHandler(conn):
 
     if uspesno:
         all_connections.append(conn)
-        print("uspesno")
 
     if len(all_connections) == 2:
         time.sleep(.500)
+
         for conn in all_connections:
-            conn.send(str.encode("ready"))
-        start_new_thread(game, (all_connections[0], all_connections[1]))
-        all_connections.clear()
+            try:
+                conn.send(str.encode("test"))
+            except:
+                all_connections.remove(conn)
+
+        if len(all_connections) == 2:
+            all_connections[0].send(str.encode("prvi"))
+            time.sleep(0.500)
+            for conn in all_connections:
+                conn.send(str.encode("ready"))
+            start_new_thread(game, (all_connections[0], all_connections[1]))
+            all_connections.clear()
     return
 
 

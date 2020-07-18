@@ -29,10 +29,20 @@ i16 = pygame.image.load("img/loading1.png")
 i17 = pygame.image.load("img/enter.png")
 i18 = pygame.image.load("img/patient.png")
 i19 = pygame.image.load("img/dblue.jpg")
+i20 = pygame.image.load("img/movieback2.jpg")
+i21 = pygame.image.load("img/sportback1.jpg")
+i22 = pygame.image.load("img/scienceback.jpg")
+i23 = pygame.image.load("img/triviaback.jpg")
+i24 = pygame.image.load("img/switchon.png")
+i25 = pygame.image.load("img/switchoff.png")
 
 
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
 gcolors = ((135, 206, 250), (30, 144, 255), (65, 105, 225))
+scolors = ((169,169,169), (128,128,128),(105,105,105))
+mcolors = ((255,245,238), (255,239,213), (255,228,225))
+spcolors = ((233,150,122), (255,127,80), (255,99,71))
+tcolors = ((175,238,238), (72,209,204), (95,158,160))
 
 
 score1 = 0
@@ -40,6 +50,8 @@ score2 = 0
 p1Name = ""
 p2Name = ""
 password = ""
+running = True
+running1 = True
 
 m1 = pygame.mixer.music.load("msc/seka.mp3")
 #m2 = pygame.mixer.music.load("msc/m1.mp3")
@@ -135,6 +147,8 @@ def startWindow():
     global data
     global p1Name
     global password
+    global running
+    global running1
     screen = pygame.display.set_mode((500, 300))
     font = pygame.font.Font(None, 32)
     clock = pygame.time.Clock()
@@ -172,6 +186,9 @@ def startWindow():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+                running1 = False
+                running = False
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # If the user clicked on the input_box rect.
                 if input_box.collidepoint(event.pos):
@@ -263,7 +280,7 @@ def main(n):
     global p1Name
     global p2Name
     global data
-    running = True
+    global running
     #n = Network()
     #start_new_thread(dataRead, (n,))
     history_true = True
@@ -280,14 +297,21 @@ def main(n):
     i = 0
     #pygame.mixer.music.play(-1)
     j = 0
+    x = 0
 
+    global running1
 
-    while True:
+    while running1:
         win = pygame.display.set_mode((width, height))
         win.blit(i19, (0,0))
         #win.fill((119, 136, 153))
         txt = scoreFont.render("Povezivanje sa drugim igracem...", True, (0,0,0))
         win.blit(txt, (100, 200))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running1 = False
+                running = False
 
         if j % 2 == 0:
             win.blit(i15, (450, 300))
@@ -297,8 +321,13 @@ def main(n):
 
         pygame.time.wait(500)
         j = j + 1
+        if data == "prvi":
+            x = 1
+
         if data == "ready":
             break
+
+
 
 
 
@@ -320,7 +349,7 @@ def main(n):
         win.blit(score1Text, (20, 10))
         win.blit(score2Text, (950 - len(p2Name) * 20, 10))
 
-        if data == "turn":
+        if x % 2 == 1:
             turn = True
 
         win.blit(i2, (int(width / 5 + offset_x), int(height / 4 + offset_y)))
@@ -360,6 +389,10 @@ def main(n):
             win.blit(i14, (20, height - 80))
             pygame.mixer.music.pause()
 
+        if x % 2 == 1:
+            win.blit(i24, (484,20))
+        else:
+            win.blit(i25, (484,20))
 
         if str(data).startswith("pokreni_history"):
             niz = data.split("::")
@@ -373,15 +406,41 @@ def main(n):
             gameWindow(n, i12, gcolors, pitanja)
             geography_true = False
 
+        if str(data).startswith("pokreni_cinema"):
+            niz = data.split("::")
+            pitanja = niz[1]
+            gameWindow(n, i20, mcolors, pitanja)
+            cinema_true = False
+
+
+        if str(data).startswith("pokreni_sport"):
+            niz = data.split("::")
+            pitanja = niz[1]
+            gameWindow(n, i21, spcolors, pitanja)
+            sport_true = False
+
+        if str(data).startswith("pokreni_science"):
+            niz = data.split("::")
+            pitanja = niz[1]
+            gameWindow(n, i22, scolors, pitanja)
+            science_true = False
+
+        if str(data).startswith("pokreni_trivia"):
+            niz = data.split("::")
+            pitanja = niz[1]
+            gameWindow(n, i23, tcolors, pitanja)
+            trivia_true = False
+
+
+
+
         if str(data).startswith("Score:"):
             score = str(data).split(":")[1]
-            pygame.time.wait(500)
             print("primio: " + str(score))
             score2 = int(score)
-            if i == 1:
-                n.send("fin")
-                turn = False
-                i = 0
+            x += 1
+            turn = False
+
 
 
         data = ""
@@ -394,8 +453,6 @@ def main(n):
                 if width / 5 + offset_x + 128 > pos_x > width / 5 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and history_true and turn:
                     n.send("history")
                     i = 1
-                    #history_true = False
-
 
                 if width / 5 * 2 + offset_x + 128 > pos_x > width / 5 * 2 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and geography_true and turn:
                     n.send("geography")
@@ -404,22 +461,18 @@ def main(n):
 
                 if width / 5 * 3 + offset_x + 128 > pos_x > width / 5 * 3 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and cinema_true and turn:
                     n.send("cinema")
-                    cinema_true = False
                     i = 1
 
                 if width / 5 + offset_x + 128 > pos_x > width / 5 + offset_x and height / 2 + offset_y < pos_y < height / 2 + offset_y + 128 and sport_true and turn:
                     n.send("sport")
-                    sport_true = False
                     i = 1
 
                 if width / 5 * 2 + offset_x + 128 > pos_x > width / 5 * 2 + offset_x and height / 2 + offset_y < pos_y < height / 2 + offset_y + 128 and science_true and turn:
                     n.send("science")
-                    science_true = False
                     i = 1
 
                 if width / 5 * 3 + offset_x + 128 > pos_x > width / 5 * 3 + offset_x and height / 2 + offset_y < pos_y < height / 2 + offset_y + 128 and trivia_true and turn:
                     n.send("trivia")
-                    trivia_true = False
                     i = 1
 
                 if 20 < pos_x < 52 and height - 80 < pos_y < height - 80 + 32:
