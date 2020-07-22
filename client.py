@@ -35,6 +35,13 @@ i22 = pygame.image.load("img/scienceback.jpg")
 i23 = pygame.image.load("img/triviaback.jpg")
 i24 = pygame.image.load("img/switchon.png")
 i25 = pygame.image.load("img/switchoff.png")
+i26 = pygame.image.load("img/one (1).png")
+i27 = pygame.image.load("img/two (1).png")
+i28 = pygame.image.load("img/three (1).png")
+i29 = pygame.image.load("img/four (1).png")
+i30 = pygame.image.load("img/five (1).png")
+i31 = pygame.image.load("img/stop.png")
+
 
 
 hcolors = ((219, 176, 102), (204, 153, 51), (223, 129, 35))
@@ -67,11 +74,15 @@ def quest(win2, pitanje, colors):
     crtProcitano1 = float(crtProcitano)
     questFont = pygame.font.SysFont("comicsansms", 40)
     ansFont = pygame.font.SysFont("comicsansms", 25)
+    timerFont = pygame.font.SysFont("comicsansms", 25)
     q1 = questFont.render(q, True, (0, 0, 0))
     ans11 = ansFont.render(ans1, True, (0, 0, 0))
     ans22 = ansFont.render(ans2, True, (0, 0, 0))
     ans33 = ansFont.render(ans3, True, (0, 0, 0))
     scr = 0
+    odgovoreno = False
+    kraj = False
+    gdeJeX = 0
 
     win2.blit(q1, (100, 50))
     pygame.draw.rect(win2, colors[0], (0, 170, width, 100))
@@ -84,21 +95,64 @@ def quest(win2, pitanje, colors):
     win2.blit(ans33, (100, 500))
     win2.blit(i10, (50, 508))
 
-    while pygame.time.get_ticks() - x < 3000:
+    while pygame.time.get_ticks() - x < 6000:
+        if 6000 - pygame.time.get_ticks() + x > 5000:
+            win2.blit(i30, (920, 70))
+        elif 6000 - pygame.time.get_ticks() + x > 4000:
+            win2.blit(i29, (920, 70))
+        elif 6000 - pygame.time.get_ticks()  + x > 3000:
+            win2.blit(i28, (920, 70))
+        elif 6000 - pygame.time.get_ticks() + x > 2000:
+            win2.blit(i27, (920, 70))
+        elif 6000 - pygame.time.get_ticks() + x > 1000:
+            win2.blit(i26, (920, 70))
+        elif 6000 - pygame.time.get_ticks() + x > 0:
+            win2.blit(i31, (920, 70))
+            if crtProcitano1 == 1:
+                pygame.draw.rect(win2, (50,205,50), (0, 170, width, 100))
+                win2.blit(ans11, (100, 200))
+                win2.blit(i10, (50, 208))
+            if crtProcitano1 == 2:
+                pygame.draw.rect(win2, (50,205,50), (0, 320, width, 100))
+                win2.blit(ans22, (100, 350))
+                win2.blit(i10, (50, 358))
+            if crtProcitano1 == 3:
+                pygame.draw.rect(win2, (50,205,50), (0, 470, width, 100))
+                win2.blit(ans33, (100, 500))
+                win2.blit(i10, (50, 508))
+
+
+            if gdeJeX == 1:
+                win2.blit(i11, (50, 208))
+            if gdeJeX == 2:
+                win2.blit(i11, (50, 358))
+            if gdeJeX == 3:
+                win2.blit(i11, (50, 508))
+
+            kraj = True
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                runn = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos_x, pos_y = pygame.mouse.get_pos()
-                if 170 < pos_y < 270:
-                    win2.blit(i11, (50, 208))
-                    crt = 1
-                if 320 < pos_y < 420:
-                    win2.blit(i11, (50, 358))
-                    crt = 2
-                if 470 < pos_y < 570:
-                    win2.blit(i11, (50, 508))
-                    crt = 3
+            if not kraj:
+                if event.type == pygame.QUIT:
+                    runn = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos_x, pos_y = pygame.mouse.get_pos()
+                    if 170 < pos_y < 270 and not odgovoreno:
+                        win2.blit(i11, (50, 208))
+                        crt = 1
+                        gdeJeX = 1
+                        odgovoreno = True
+                    if 320 < pos_y < 420 and not odgovoreno:
+                        win2.blit(i11, (50, 358))
+                        crt = 2
+                        gdeJeX = 2
+                        odgovoreno = True
+                    if 470 < pos_y < 570 and not odgovoreno:
+                        win2.blit(i11, (50, 508))
+                        crt = 3
+                        gdeJeX = 3
+                        odgovoreno = True
+
         pygame.display.update()
 
     if crt == crtProcitano1:
@@ -108,7 +162,6 @@ def quest(win2, pitanje, colors):
 
 
 def gameWindow(net, backimage, colors, pitanja):
-    print("Usao sam u gamewindow sa pitanjima : " + pitanja)
     running2 = True
     active = False
     x = pygame.time.get_ticks()
