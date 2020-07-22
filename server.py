@@ -8,6 +8,10 @@ client = MongoClient('mongodb://localhost:27017/')
 db = client["quiz_database"]
 history_questions = db["history_questions"]
 geography_questions = db["geography_questions"]
+sport_questions = db["sport_questions"]
+cinema_questions = db["cinema_questions"]
+science_questions = db["science_questions"]
+trivia_questions = db["trivia_questions"]
 players = db["players"]
 
 
@@ -32,9 +36,9 @@ def readFromMongo(oblast):
     i = 0
     izabrani = []
     while i < 3:
-        rnd = randint(1, 3)
+        rnd = randint(1, 10)
         while rnd in izabrani:
-            rnd = randint(1,3)
+            rnd = randint(1,10)
 
 
         izabrani.append(rnd)
@@ -81,28 +85,28 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "cinema":
-                reply = readFromMongo(geography_questions)
+                reply = readFromMongo(cinema_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_cinema::" + reply))
                 print(reply)
                 continue
 
             if data == "sport":
-                reply = readFromMongo(geography_questions)
+                reply = readFromMongo(sport_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_sport::" + reply))
                 print(reply)
                 continue
 
             if data == "science":
-                reply = readFromMongo(geography_questions)
+                reply = readFromMongo(science_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_science::" + reply))
                 print(reply)
                 continue
 
             if data == "trivia":
-                reply = readFromMongo(geography_questions)
+                reply = readFromMongo(trivia_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_trivia::" + reply))
                 print(reply)
