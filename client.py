@@ -67,8 +67,10 @@ m1 = pygame.mixer.music.load("msc/seka.mp3")
 def quest(win2, pitanje, colors):
     global score1
     global score2
+    global x
+    global brojIgara
     crt = 0
-    x = pygame.time.get_ticks()
+    t = pygame.time.get_ticks()
     runn = True
     q, ans1, ans2, ans3, crtProcitano = pitanje.split(",")
     crtProcitano1 = float(crtProcitano)
@@ -95,18 +97,18 @@ def quest(win2, pitanje, colors):
     win2.blit(ans33, (100, 500))
     win2.blit(i10, (50, 508))
 
-    while pygame.time.get_ticks() - x < 6000:
-        if 6000 - pygame.time.get_ticks() + x > 5000:
+    while pygame.time.get_ticks() - t < 1000:
+        if 6000 - pygame.time.get_ticks() + t > 5000:
             win2.blit(i30, (920, 70))
-        elif 6000 - pygame.time.get_ticks() + x > 4000:
+        elif 6000 - pygame.time.get_ticks() + t > 4000:
             win2.blit(i29, (920, 70))
-        elif 6000 - pygame.time.get_ticks()  + x > 3000:
+        elif 6000 - pygame.time.get_ticks() + t > 3000:
             win2.blit(i28, (920, 70))
-        elif 6000 - pygame.time.get_ticks() + x > 2000:
+        elif 6000 - pygame.time.get_ticks() + t > 2000:
             win2.blit(i27, (920, 70))
-        elif 6000 - pygame.time.get_ticks() + x > 1000:
+        elif 6000 - pygame.time.get_ticks() + t > 1000:
             win2.blit(i26, (920, 70))
-        elif 6000 - pygame.time.get_ticks() + x > 0:
+        elif 6000 - pygame.time.get_ticks() + t > 0:
             win2.blit(i31, (920, 70))
             if crtProcitano1 == 1:
                 pygame.draw.rect(win2, (50,205,50), (0, 170, width, 100))
@@ -155,9 +157,23 @@ def quest(win2, pitanje, colors):
 
         pygame.display.update()
 
-    if crt == crtProcitano1:
-        score1 += 1
-
+    if crt != 0:
+        if crt == crtProcitano1:
+            if brojIgara != 4:
+                if x % 2 == 1:
+                    score1 += 2
+                else:
+                    score1 += 1
+            else:
+                score1 += 3
+        else:
+            if brojIgara != 4:
+                if x % 2 == 1:
+                    score1 -= 2
+                else:
+                    score1 -= 1
+            else:
+                score1 -= 3
     return runn
 
 
@@ -326,7 +342,8 @@ def startWindow():
 
 
 
-
+x = 0
+brojIgara = 0
 
 
 def main(n):
@@ -350,8 +367,9 @@ def main(n):
     i = 0
     #pygame.mixer.music.play(-1)
     j = 0
-    x = 0
-
+    global x
+    global brojIgara
+    prvi = False
     global running1
 
     while running1:
@@ -376,6 +394,7 @@ def main(n):
         j = j + 1
         if data == "prvi":
             x = 1
+            prvi = True
 
         if data == "ready":
             break
@@ -392,6 +411,8 @@ def main(n):
         p2Name = str(data).split(':')[1]
 
 
+
+
     data = ""
     while running:
         score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
@@ -402,8 +423,29 @@ def main(n):
         win.blit(score1Text, (20, 10))
         win.blit(score2Text, (950 - len(p2Name) * 20, 10))
 
+
         if x % 2 == 1:
             turn = True
+
+        if brojIgara == 4 and prvi:
+            s = "zavrsio"
+            if history_true:
+                s += "/history"
+            if geography_true:
+                s += "/geography"
+            if cinema_true:
+                s += "/cinema"
+            if sport_true:
+                s += "/sport"
+            if science_true:
+                s += "/science"
+            if trivia_true:
+                s += "/trivia"
+            n.send(s)
+            brojIgara += 1
+
+        if brojIgara >= 4:
+            turn = False
 
         win.blit(i2, (int(width / 5 + offset_x), int(height / 4 + offset_y)))
 
@@ -442,10 +484,13 @@ def main(n):
             win.blit(i14, (20, height - 80))
             pygame.mixer.music.pause()
 
-        if x % 2 == 1:
-            win.blit(i24, (484,20))
+        if brojIgara != 4:
+            if x % 2 == 1:
+                win.blit(i24, (484,20))
+            else:
+                win.blit(i25, (484,20))
         else:
-            win.blit(i25, (484,20))
+            win.blit(i25, (484, 20))
 
         if str(data).startswith("pokreni_history"):
             niz = data.split("::")
@@ -492,6 +537,7 @@ def main(n):
             print("primio: " + str(score))
             score2 = int(score)
             x += 1
+            brojIgara += 1
             turn = False
 
 

@@ -28,6 +28,8 @@ except socket.error as e:
 
 s.listen(2)
 
+
+
 print("Waiting for connection, Server started")
 
 
@@ -67,10 +69,14 @@ def threaded_client(conn1, conn2):
     game_connections = []
     game_connections.append(conn1)
     game_connections.append(conn2)
+    odigraneIgre = []
+    sveIgre = ["history", "geography", "cinema", "sport", "science", "trivia"]
+    preostaleIgre = []
     while True:
         try:
             data = conn1.recv(2048).decode()
             if data == "history":
+                odigraneIgre.append("history")
                 reply = readFromMongo(history_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
@@ -78,6 +84,7 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "geography":
+                odigraneIgre.append("geography")
                 reply = readFromMongo(geography_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_geography::" + reply))
@@ -85,6 +92,7 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "cinema":
+                odigraneIgre.append("cinema")
                 reply = readFromMongo(cinema_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_cinema::" + reply))
@@ -92,6 +100,7 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "sport":
+                odigraneIgre.append("sport")
                 reply = readFromMongo(sport_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_sport::" + reply))
@@ -99,6 +108,7 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "science":
+                odigraneIgre.append("science")
                 reply = readFromMongo(science_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_science::" + reply))
@@ -106,6 +116,7 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "trivia":
+                odigraneIgre.append("trivia")
                 reply = readFromMongo(trivia_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_trivia::" + reply))
@@ -128,6 +139,39 @@ def threaded_client(conn1, conn2):
                 playerName = str(data).split(':')[1]
                 conn2.send(str.encode(data))
                 continue
+
+            if str(data).startswith("zavrsio"):
+                s2 = str(data).split('/')
+                preostaleIgre.append(s2[1])
+                preostaleIgre.append(s2[2])
+
+                rnd1 = randint(0,1)
+                s = preostaleIgre[rnd1]
+                if s == "history":
+                    reply = readFromMongo(history_questions)
+                elif s == "geography":
+                    reply = readFromMongo(geography_questions)
+                elif s == "cinema":
+                    reply = readFromMongo(cinema_questions)
+                elif s == "sport":
+                    reply = readFromMongo(sport_questions)
+                elif s == "science":
+                    reply = readFromMongo(science_questions)
+                if s == "trivia":
+                    reply = readFromMongo(trivia_questions)
+
+                for igra in preostaleIgre:
+                    print(igra)
+
+                s1 = "pokreni_" + s + "::" + reply
+                print("SALJEEEEEEEM:      " + s1)
+                time.sleep(0.800)
+                for c in game_connections:
+                    c.sendall(str.encode(s1))
+
+                continue
+
+
 
             if not data:
                 print("Disconnected")
