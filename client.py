@@ -375,6 +375,14 @@ def endWindow(n):
             if event.type == pygame.QUIT:
                 running2 = False
                 running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos_x, pos_y = pygame.mouse.get_pos()
+                if 0 < pos_x < 100 and 0 < pos_y < 100:
+                    running2 = False
+                if 900 < pos_x < 1000 and 0 < pos_y < 100:
+                    running2 = False
+                    n.send("Nova igra")
+                    main(n)
 
         pygame.display.update()
 
@@ -464,6 +472,26 @@ def main(n):
         if zavrseneIgre == 5:
             print("ZAVRSENOOOO")
             endWindow(n)
+            history_true = True
+            geography_true = True
+            cinema_true = True
+            sport_true = True
+            science_true = True
+            trivia_true = True
+            sound_true = True
+
+            if prvi:
+                prvi = False
+                x = 0
+            else:
+                prvi = True
+                x = 1
+
+            score1 = 0
+            score2 = 0
+
+            brojIgara = 0
+            zavrseneIgre = 0
 
 
 

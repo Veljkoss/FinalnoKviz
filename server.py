@@ -63,6 +63,7 @@ def game(conn1, conn2):
 
 
 def threaded_client(conn1, conn2):
+    global all_connections
     playerName = ""
     score = 0
 
@@ -76,7 +77,6 @@ def threaded_client(conn1, conn2):
         try:
             data = conn1.recv(2048).decode()
             if data == "history":
-                odigraneIgre.append("history")
                 reply = readFromMongo(history_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_history::" + reply))
@@ -84,7 +84,6 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "geography":
-                odigraneIgre.append("geography")
                 reply = readFromMongo(geography_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_geography::" + reply))
@@ -92,7 +91,6 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "cinema":
-                odigraneIgre.append("cinema")
                 reply = readFromMongo(cinema_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_cinema::" + reply))
@@ -100,7 +98,6 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "sport":
-                odigraneIgre.append("sport")
                 reply = readFromMongo(sport_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_sport::" + reply))
@@ -108,7 +105,6 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "science":
-                odigraneIgre.append("science")
                 reply = readFromMongo(science_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_science::" + reply))
@@ -116,7 +112,6 @@ def threaded_client(conn1, conn2):
                 continue
 
             if data == "trivia":
-                odigraneIgre.append("trivia")
                 reply = readFromMongo(trivia_questions)
                 for c in game_connections:
                     c.sendall(str.encode("pokreni_trivia::" + reply))
@@ -168,8 +163,13 @@ def threaded_client(conn1, conn2):
                 time.sleep(0.800)
                 for c in game_connections:
                     c.sendall(str.encode(s1))
-
                 continue
+
+            if data == "Nova igra":
+                print("NOVA IGRA")
+                all_connections.append(conn1)
+                return
+
 
 
 
