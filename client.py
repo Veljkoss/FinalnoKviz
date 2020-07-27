@@ -341,9 +341,46 @@ def startWindow():
     main(n)
 
 
-
 x = 0
 brojIgara = 0
+
+def endWindow(n):
+    global p1Name
+    global p2Name
+    global data
+    global running
+    global score1
+    scoreFont = pygame.font.SysFont("comicsansms", 40)
+    global score2
+    running2 = True
+    score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
+    score2Text = scoreFont.render(p2Name + ":" + str(score2), True, (0, 0, 0))
+    domacin = score1 > score2
+
+    while running2:
+        win = pygame.display.set_mode((width, height))
+        win.blit(score1Text, (20, 10))
+        win.blit(score2Text, (950 - len(p2Name) * 20, 10))
+
+        if domacin:
+            win.blit(i19, (0, 0))
+            txt = scoreFont.render("Pobeda", True, (0,0,0))
+            win.blit(txt, (400, 150))
+        else:
+            win.blit(i19, (0, 0))
+            txt = scoreFont.render("Poraz", True, (0,0,0))
+            win.blit(txt, (400, 150))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running2 = False
+                running = False
+
+        pygame.display.update()
+
+
+
+
 
 
 def main(n):
@@ -371,6 +408,7 @@ def main(n):
     global brojIgara
     prvi = False
     global running1
+    zavrseneIgre = 0
 
     while running1:
         win = pygame.display.set_mode((width, height))
@@ -399,10 +437,6 @@ def main(n):
         if data == "ready":
             break
 
-
-
-
-
     pygame.time.wait(500)
     n.send("name:" + p1Name)
     pygame.time.wait(500)
@@ -426,6 +460,12 @@ def main(n):
 
         if x % 2 == 1:
             turn = True
+
+        if zavrseneIgre == 5:
+            print("ZAVRSENOOOO")
+            endWindow(n)
+
+
 
         if brojIgara == 4 and prvi:
             s = "zavrsio"
@@ -538,6 +578,7 @@ def main(n):
             score2 = int(score)
             x += 1
             brojIgara += 1
+            zavrseneIgre += 1
             turn = False
 
 
