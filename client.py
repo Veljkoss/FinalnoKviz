@@ -59,6 +59,7 @@ p2Name = ""
 password = ""
 running = True
 running1 = True
+novaIgra = False
 
 m1 = pygame.mixer.music.load("msc/seka.mp3")
 #m2 = pygame.mixer.music.load("msc/m1.mp3")
@@ -213,6 +214,7 @@ def dataRead(net):
 def startWindow():
     n = Network()
     start_new_thread(dataRead, (n,))
+
     global data
     global p1Name
     global password
@@ -353,6 +355,7 @@ def endWindow(n):
     scoreFont = pygame.font.SysFont("comicsansms", 40)
     global score2
     running2 = True
+    revans = False
     score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
     score2Text = scoreFont.render(p2Name + ":" + str(score2), True, (0, 0, 0))
     domacin = score1 > score2
@@ -378,10 +381,21 @@ def endWindow(n):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos_x, pos_y = pygame.mouse.get_pos()
                 if 0 < pos_x < 100 and 0 < pos_y < 100:
-                    running2 = False
+                    n.send("revans")
+                    if str(data) == "revans":
+                        revans = True
+                    x = pygame.time.get_ticks()
+                    while pygame.time.get_ticks() - x < 5000:
+                        if revans:
+                            running2 = False
+                            break
+                        if str(data) == "revans":
+                            revans = True
+
+
                 if 900 < pos_x < 1000 and 0 < pos_y < 100:
                     running2 = False
-                    n.send("Nova igra")
+                    n = Network()
                     main(n)
 
         pygame.display.update()
@@ -392,6 +406,7 @@ def endWindow(n):
 
 
 def main(n):
+    global novaIgra
     global p1Name
     global p2Name
     global data
@@ -417,6 +432,7 @@ def main(n):
     prvi = False
     global running1
     zavrseneIgre = 0
+    novaIgra = True
 
     while running1:
         win = pygame.display.set_mode((width, height))
