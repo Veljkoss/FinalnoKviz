@@ -41,6 +41,8 @@ i28 = pygame.image.load("img/three (1).png")
 i29 = pygame.image.load("img/four (1).png")
 i30 = pygame.image.load("img/five (1).png")
 i31 = pygame.image.load("img/stop.png")
+i32 = pygame.image.load("img/revans.png")
+i33 = pygame.image.load("img/new.png")
 
 
 
@@ -216,6 +218,7 @@ def startWindow():
     start_new_thread(dataRead, (n,))
 
     global data
+    data = ""
     global p1Name
     global password
     global running
@@ -356,23 +359,32 @@ def endWindow(n):
     global score2
     running2 = True
     revans = False
+    global x
+    global brojIgara
     score1Text = scoreFont.render(p1Name + ":" + str(score1), True, (0, 0, 0))
     score2Text = scoreFont.render(p2Name + ":" + str(score2), True, (0, 0, 0))
     domacin = score1 > score2
 
     while running2:
         win = pygame.display.set_mode((width, height))
-        win.blit(score1Text, (20, 10))
-        win.blit(score2Text, (950 - len(p2Name) * 20, 10))
+
 
         if domacin:
             win.blit(i19, (0, 0))
+            win.blit(i32, (400, 320))
+            win.blit(i33, (536, 320))
+            win.blit(score1Text, (20, 10))
+            win.blit(score2Text, (950 - len(p2Name) * 20, 10))
             txt = scoreFont.render("Pobeda", True, (0,0,0))
-            win.blit(txt, (400, 150))
+            win.blit(txt, (450, 150))
         else:
             win.blit(i19, (0, 0))
+            win.blit(i32, (400, 320))
+            win.blit(i33, (536, 320))
+            win.blit(score1Text, (20, 10))
+            win.blit(score2Text, (950 - len(p2Name) * 20, 10))
             txt = scoreFont.render("Poraz", True, (0,0,0))
-            win.blit(txt, (400, 150))
+            win.blit(txt, (450, 150))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -380,7 +392,7 @@ def endWindow(n):
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos_x, pos_y = pygame.mouse.get_pos()
-                if 0 < pos_x < 100 and 0 < pos_y < 100:
+                if 400 < pos_x < 464 and 320 < pos_y < 384:
                     n.send("revans")
                     if str(data) == "revans":
                         revans = True
@@ -393,10 +405,15 @@ def endWindow(n):
                             revans = True
 
 
-                if 900 < pos_x < 1000 and 0 < pos_y < 100:
+                if 536 < pos_x < 600 and 320 < pos_y < 384:
                     running2 = False
-                    n = Network()
-                    main(n)
+                    x = 0
+                    brojIgara = 0
+                    score1 = 0
+                    score2 = 0
+                    startWindow()
+                    #n = Network()
+                    #main(n)
 
         pygame.display.update()
 
@@ -470,6 +487,8 @@ def main(n):
 
 
 
+    print(x)
+    print("data je: " + str(data))
 
     data = ""
     while running:
@@ -482,7 +501,7 @@ def main(n):
         win.blit(score2Text, (950 - len(p2Name) * 20, 10))
 
 
-        if x % 2 == 1:
+        if x % 2 == 1 or x == 1:
             turn = True
 
         if zavrseneIgre == 5:
@@ -508,7 +527,6 @@ def main(n):
 
             brojIgara = 0
             zavrseneIgre = 0
-
 
 
         if brojIgara == 4 and prvi:
@@ -625,6 +643,14 @@ def main(n):
             zavrseneIgre += 1
             turn = False
 
+        if str(data) == "izasao":
+            x = 0
+            brojIgara = 0
+            score1 = 0
+            score2 = 0
+            startWindow()
+            break
+
 
 
         data = ""
@@ -632,8 +658,15 @@ def main(n):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                n.send("izasao")
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos_x, pos_y = pygame.mouse.get_pos()
+                if 0 < pos_x < 50 and 0 < pos_y < 50:
+                    print(turn)
+                    print(x)
+                    print(history_true)
+                    print(brojIgara)
+                    print(data)
                 if width / 5 + offset_x + 128 > pos_x > width / 5 + offset_x and height / 4 + offset_y < pos_y < height / 4 + offset_y + 128 and history_true and turn:
                     n.send("history")
                     i = 1

@@ -174,6 +174,11 @@ def threaded_client(conn1, conn2):
                 conn2.send(str.encode("revans"))
                 continue
 
+            if data == "izasao":
+                conn2.send(str.encode("izasao"))
+                conn.close()
+                return
+
 
 
 
@@ -255,17 +260,40 @@ def logHandler(conn):
                 all_connections.remove(conn)
 
         if len(all_connections) > 1:
-            all_connections[0].send(str.encode("prvi"))
+            i = -1
+            for conn in all_connections:
+                i += 1
+            print(i)
+            first = randint(0, i)
+            all_connections[first].send(str.encode("prvi"))
             time.sleep(0.500)
-            conn1 = all_connections[0]
-            conn2 = all_connections[1]
-            all_connections.clear()
+            conn1 = all_connections[first]
+            all_connections.remove(conn1)
+            second = randint(0, i - 1)
+            conn2 = all_connections[second]
+            all_connections.remove(conn2)
             conn1.send(str.encode("ready"))
             conn2.send(str.encode("ready"))
+            start_new_thread(game, (conn1, conn2))
+
+
+
+
+
+
+
+
+            #all_connections[0].send(str.encode("prvi"))
+            #time.sleep(0.500)
+            #conn1 = all_connections[0]
+            #conn2 = all_connections[1]
+            #all_connections.clear()
+            #conn1.send(str.encode("ready"))
+            #conn2.send(str.encode("ready"))
 
             #for conn in all_connections:
             #    conn.send(str.encode("ready"))
-            start_new_thread(game, (conn1, conn2))
+            #start_new_thread(game, (conn1, conn2))
             #all_connections.clear()
 
 
