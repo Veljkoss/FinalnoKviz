@@ -14,8 +14,7 @@ science_questions = db["science_questions"]
 trivia_questions = db["trivia_questions"]
 players = db["players"]
 
-
-server = "127.0.0.1"
+server = "192.168.0.30"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,8 +27,6 @@ except socket.error as e:
 
 s.listen(2)
 
-
-
 print("Waiting for connection, Server started")
 
 
@@ -40,8 +37,7 @@ def readFromMongo(oblast):
     while i < 3:
         rnd = randint(1, 10)
         while rnd in izabrani:
-            rnd = randint(1,10)
-
+            rnd = randint(1, 10)
 
         izabrani.append(rnd)
 
@@ -140,7 +136,7 @@ def threaded_client(conn1, conn2):
                 preostaleIgre.append(s2[1])
                 preostaleIgre.append(s2[2])
 
-                rnd1 = randint(0,1)
+                rnd1 = randint(0, 1)
                 s = preostaleIgre[rnd1]
                 if s == "history":
                     reply = readFromMongo(history_questions)
@@ -179,9 +175,6 @@ def threaded_client(conn1, conn2):
                 conn.close()
                 return
 
-
-
-
             if not data:
                 print("Disconnected")
                 break
@@ -201,9 +194,7 @@ def threaded_client(conn1, conn2):
     pl = players.find()
     for player in pl:
         if playerName == player["name"]:
-            players.update_one({ "_id": player["_id"]}, { "$set": {"score": int(player["score"]) + score}})
-
-
+            players.update_one({"_id": player["_id"]}, {"$set": {"score": int(player["score"]) + score}})
 
     print("Lost connection")
     conn.close()
@@ -263,10 +254,11 @@ def logHandler(conn):
             i = -1
             for conn in all_connections:
                 i += 1
+
             print(i)
             first = randint(0, i)
             all_connections[first].send(str.encode("prvi"))
-            time.sleep(0.500)
+            time.sleep(0.800)
             conn1 = all_connections[first]
             all_connections.remove(conn1)
             second = randint(0, i - 1)
@@ -277,31 +269,27 @@ def logHandler(conn):
             start_new_thread(game, (conn1, conn2))
 
 
+            # all_connections[0].send(str.encode("prvi"))
+            # time.sleep(0.500)
+            # conn1 = all_connections[0]
+            # conn2 = all_connections[1]
+            # all_connections.clear()
+            # conn1.send(str.encode("ready"))
+            # conn2.send(str.encode("ready"))
 
-
-
-
-
-
-            #all_connections[0].send(str.encode("prvi"))
-            #time.sleep(0.500)
-            #conn1 = all_connections[0]
-            #conn2 = all_connections[1]
-            #all_connections.clear()
-            #conn1.send(str.encode("ready"))
-            #conn2.send(str.encode("ready"))
-
-            #for conn in all_connections:
+            # for conn in all_connections:
             #    conn.send(str.encode("ready"))
-            #start_new_thread(game, (conn1, conn2))
-            #all_connections.clear()
-
+            # start_new_thread(game, (conn1, conn2))
+            # all_connections.clear()
 
     return
 
 
-while True:
-    conn, addr = s.accept()
-    start_new_thread(logHandler, (conn,))
-    #all_connections.append(conn)
-    print("Connected to:", addr)
+def main():
+    while True:
+        conn, addr = s.accept()
+        start_new_thread(logHandler, (conn,))
+        print("Connected to:", addr)
+
+
+main()

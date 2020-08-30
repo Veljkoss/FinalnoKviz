@@ -62,10 +62,12 @@ password = ""
 running = True
 running1 = True
 novaIgra = False
-
-m1 = pygame.mixer.music.load("msc/seka.mp3")
-#m2 = pygame.mixer.music.load("msc/m1.mp3")
-
+data = ""
+x = 0
+brojIgara = 0
+#m1 = pygame.mixer.music.load("msc/seka.mp3")
+m2 = pygame.mixer.music.load("msc/m1.mp3")
+pygame.display.set_caption("KvizRMT")
 
 def quest(win2, pitanje, colors):
     global score1
@@ -100,7 +102,7 @@ def quest(win2, pitanje, colors):
     win2.blit(ans33, (100, 500))
     win2.blit(i10, (50, 508))
 
-    while pygame.time.get_ticks() - t < 1000:
+    while pygame.time.get_ticks() - t < 6000:
         if 6000 - pygame.time.get_ticks() + t > 5000:
             win2.blit(i30, (920, 70))
         elif 6000 - pygame.time.get_ticks() + t > 4000:
@@ -179,7 +181,6 @@ def quest(win2, pitanje, colors):
                 score1 -= 3
     return runn
 
-
 def gameWindow(net, backimage, colors, pitanja):
     running2 = True
     active = False
@@ -200,9 +201,6 @@ def gameWindow(net, backimage, colors, pitanja):
             running2 = False
 
     net.send("Score:" + str(score1))
-
-data = ""
-
 
 def dataRead(net):
     global data
@@ -264,19 +262,18 @@ def startWindow():
                 running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # If the user clicked on the input_box rect.
                 if input_box.collidepoint(event.pos):
-                    # Toggle the active variable.
+
                     active = not active
                 else:
                     active = False
 
                 if input_box1.collidepoint(event.pos):
-                    # Toggle the active variable.
+
                     active1 = not active
                 else:
                     active1 = False
-                # Change the current color of the input box.
+
                 color = color_active if active else color_inactive
                 color1 = color_active if active1 else color_inactive
             if event.type == pygame.KEYDOWN:
@@ -307,8 +304,6 @@ def startWindow():
                     n.send("reg/" + p1Name + ":" + password)
 
         screen.blit(i19, (0, 0))
-        #screen.fill((119, 136, 153))
-        # Render the current text.
         txt_surface = font.render(text, True, color)
         txt_surface1 = font.render("*" * len(text1), True, color)
         txt_surface2 = font.render("Neispravan username/lozinka!", True, (178, 34, 34))
@@ -327,27 +322,23 @@ def startWindow():
             screen.blit(txt_surface4, (85, 250))
 
 
-        # Resize the box if the text is too long.
+
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
         input_box1.w = width
-        # Blit the text.
+
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         screen.blit(txt_surface1, (input_box1.x+5, input_box1.y+5))
         screen.blit(i17, (218 - 20, 175))
         screen.blit(i18, (250 + 20, 175))
 
-        # Blit the input_box rect.
+
         pygame.draw.rect(screen, color, input_box, 2)
         pygame.draw.rect(screen, color1, input_box1, 2)
         pygame.display.update()
         clock.tick(30)
 
     main(n)
-
-
-x = 0
-brojIgara = 0
 
 def endWindow(n):
     global p1Name
@@ -356,6 +347,7 @@ def endWindow(n):
     global running
     global score1
     scoreFont = pygame.font.SysFont("comicsansms", 40)
+    winFont = pygame.font.SysFont("", 64)
     global score2
     running2 = True
     revans = False
@@ -416,11 +408,6 @@ def endWindow(n):
                     #main(n)
 
         pygame.display.update()
-
-
-
-
-
 
 def main(n):
     global novaIgra
@@ -704,6 +691,4 @@ def main(n):
 
         pygame.display.update()
 
-
-#main()
 startWindow()
