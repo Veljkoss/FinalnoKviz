@@ -485,7 +485,7 @@ def main(n):
         win.blit(i19, (0,0))
         #win.fill((119, 136, 153))
         win.blit(score1Text, (20, 10))
-        win.blit(score2Text, (950 - len(p2Name) * 20, 10))
+        win.blit(score2Text, (950 - len(p2Name) * 20 - 20, 10))
 
 
         if x % 2 == 1 or x == 1:
@@ -631,6 +631,14 @@ def main(n):
             turn = False
 
         if str(data) == "izasao":
+            t = pygame.time.get_ticks()
+            fnt = pygame.font.SysFont("comicsansms", 40)
+            txt = fnt.render("PROTIVNIK JE NAPUSTIO IGRU", True, (0, 0, 0))
+            while pygame.time.get_ticks() - t < 5000 :
+                win = pygame.display.set_mode((1000, 500))
+                win.blit(i19, (0,0))
+                win.blit(txt, (300, 220))
+                pygame.display.update()
             x = 0
             brojIgara = 0
             score1 = 0
