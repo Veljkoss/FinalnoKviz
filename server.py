@@ -14,7 +14,7 @@ science_questions = db["science_questions"]
 trivia_questions = db["trivia_questions"]
 players = db["players"]
 
-server = "192.168.0.30"
+server = " 192.168.56.1"
 port = 5555
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
